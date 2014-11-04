@@ -75,36 +75,36 @@ Rectangle {
     Column {
         spacing: 40
 
-        Row {
-        Label   {
-            text: "Samplerate: "
-            color: "white"
-        }
-        Label   {
-            id: value1
-            text: "1"
-            color: "white"
-        }
-        ComboBox {
-            id : srate
-            currentIndex: 1
-            model: ["S", "kS", "MS", "GS"]
-            onActivated: oscill.samplerateSelected(slider1.value*(10^(3*(currentIndex))))
-        }
-        }
-        Slider  {
-            id: slider1
-            minimumValue: 1
-            maximumValue: 999
-            stepSize: 1
-            value: 10
-            anchors.margins: 20
-            style: sliderStyle
-            onValueChanged: {
-                value1.text = value
-                oscill.samplerateSelected(value*(10^(3*(srate.currentIndex))))
-            }
-        }
+//        Row {
+//        Label   {
+//            text: "Samplerate: "
+//            color: "white"
+//        }
+//        Label   {
+//            id: value1
+//            text: "1"
+//            color: "white"
+//        }
+//        ComboBox {
+//            id : srate
+//            currentIndex: 1
+//            model: ["S", "kS", "MS", "GS"]
+//            onActivated: oscill.samplerateSelected(slider1.value*(10^(3*(currentIndex))))
+//        }
+//        }
+//        Slider  {
+//            id: slider1
+//            minimumValue: 1
+//            maximumValue: 999
+//            stepSize: 1
+//            value: 10
+//            anchors.margins: 20
+//            style: sliderStyle
+//            onValueChanged: {
+//                value1.text = value
+//                oscill.samplerateSelected(value*(10^(3*(srate.currentIndex))))
+//            }
+//        }
 
 
         Row {
@@ -147,7 +147,7 @@ Rectangle {
             id : volt
             currentIndex: 8
             model: ["10 mV","20 mV","50 mV","100 mV","200 mV","500 mV", "1V", "2V", "5V"]
-            onCurrentIndexChanged: oscill.voltageGainSelected(0, currentIndex) //индекс?
+            onCurrentIndexChanged: oscill.voltageGainSelected(0, currentIndex)
         }
 
 
@@ -205,38 +205,6 @@ Rectangle {
 //        }
 
 
-
-    }
-    Column {
-        spacing: 40
-
-
-        Button {
-            text: "Press me"
-            style: touchStyle
-        }
-
-        Button {
-            style: touchStyle
-            text: "Press me too"
-        }
-
-        Button {
-            anchors.margins: 20
-            style: touchStyle
-            text: "Don't press me"
-            onClicked: if (stackView) stackView.pop()
-        }
-
-        Row {
-            spacing: 20
-            Switch {
-                style: switchStyle
-            }
-            Switch {
-                style: switchStyle
-            }
-        }
 
     }
 }

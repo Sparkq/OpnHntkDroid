@@ -20,11 +20,10 @@ SOURCES += main.cpp \
     src/hardcontrol.cpp \
     src/helper.cpp \
     src/levelslider.cpp \
-    src/main_old.cpp \
     src/openhantek.cpp \
     src/settings.cpp \
     src/sispinbox.cpp \
-    src/squircle.cpp
+    src/viewer.cpp
 
 RESOURCES += qml.qrc \
     application.qrc
@@ -57,7 +56,7 @@ HEADERS += \
     src/requests.h \
     src/settings.h \
     src/sispinbox.h \
-    src/squircle.h
+    src/viewer.h
 
 unix:!macx: LIBS += -L$$PWD/libs/fftw3-armv7a/ -lfftw3
 

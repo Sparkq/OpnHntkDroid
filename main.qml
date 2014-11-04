@@ -9,8 +9,8 @@ ApplicationWindow {
         visible: true
         color: "transparent"
 
-        width: 720
-        height: 1280
+       // width: 720
+       // height: 1280
         title: qsTr("Hello World")
 
         Item {
@@ -83,7 +83,7 @@ ApplicationWindow {
 //                }
 //            }
 //        }
-        Squircle {
+        Viewer {
             id: oscill
            // SequentialAnimation  {
                // NumberAnimation { to: 1; duration: 100; easing.type: Easing.InQuad }

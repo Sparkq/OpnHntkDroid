@@ -4,7 +4,7 @@
 
 #include <QtQuick/QQuickView>
 
-#include "src/squircle.h"
+#include "src/viewer.h"
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QTranslator>
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
 
         QApplication app(argc, argv);
-        qmlRegisterType<Squircle>("OpenGLUnderQML", 1, 0, "Squircle");
+        qmlRegisterType<Viewer>("OpenGLUnderQML", 1, 0, "Viewer");
 
         QQmlApplicationEngine engine;
         engine.load(QUrl(QStringLiteral("qrc:/main.qml")));

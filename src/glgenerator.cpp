@@ -312,7 +312,7 @@ void GlGenerator::emulateGraphs() {
 
                            // horizontalFactor = this->dataAnalyzer->data(channel)->samples.voltage.interval / this->settings->scope.horizontal.timebase;
                            // horizontalFactor = (0.000000001) / this->settings->scope.horizontal.timebase;
-                        horizontalFactor = 0.01;
+                        horizontalFactor = 0.1;
                        // else
 
                           //  horizontalFactor = this->dataAnalyzer->data(channel)->samples.spectrum.interval / this->settings->scope.horizontal.frequencybase;
