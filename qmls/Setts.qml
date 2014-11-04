@@ -113,7 +113,7 @@ Rectangle {
             color: "white"
         }
         Label   {
-            id: value2
+            id: valuebase
             text: "1"
             color: "white"
         }
@@ -121,20 +121,46 @@ Rectangle {
             id : base
             currentIndex: 2
             model: ["ns", "us", "ms", "s"]
-            onActivated: oscill.timebaseSelected(slider2.value*(10^(3*(currentIndex-3))))
+            onCurrentIndexChanged: oscill.timebaseSelected(sliderbase.value, 3*(currentIndex-3))
+            onActivated: oscill.timebaseSelected(sliderbase.value, 3*(currentIndex-3))
         }
         }
         Slider  {
-            id: slider2
-            minimumValue: 1
-            maximumValue: 999
-            stepSize: 1
-            value: 1
+            id: sliderbase
+            minimumValue: 10
+            maximumValue: 1000
+            stepSize: 10
+            value: 10
             anchors.margins: 20
             style: sliderStyle
             onValueChanged: {
-                value2.text = value
-                oscill.timebaseSelected(value*(10^(3*(base.currentIndex-3))))
+                valuebase.text = value
+                oscill.timebaseSelected(value, 3*(base.currentIndex-3))
+            }
+        }
+        Row {
+        Label   {
+            text: "CH1 Offset: "
+            color: "white"
+        }
+        Label   {
+            id: valueoffset
+            text: "1"
+            color: "white"
+        }
+
+        }
+        Slider  {
+            id: slideroffset
+            minimumValue: -1
+            maximumValue: 1
+            stepSize: 0.1
+            value: 0
+            anchors.margins: 20
+            style: sliderStyle
+            onValueChanged: {
+                valueoffset.text = value
+                oscill.offsetSelected(0, value)
             }
         }
 
@@ -148,6 +174,7 @@ Rectangle {
             currentIndex: 8
             model: ["10 mV","20 mV","50 mV","100 mV","200 mV","500 mV", "1V", "2V", "5V"]
             onCurrentIndexChanged: oscill.voltageGainSelected(0, currentIndex)
+            onActivated: oscill.voltageGainSelected(0, currentIndex)
         }
 
 

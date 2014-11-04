@@ -243,17 +243,6 @@ void GlGenerator::generateGraphs() {
 }
 
 void GlGenerator::emulateGraphs() {
-//    if(!this->dataAnalyzer)
-
-//        return;
-
-    // Adapt the number of graphs
-//    for(int mode = Dso::CHANNELMODE_VOLTAGE; mode < Dso::CHANNELMODE_COUNT; ++mode) {
-//        for(int channel = this->vaChannel[mode].count(); channel < this->settings->scope.voltage.count(); ++channel)
-//            this->vaChannel[mode].append(QList<GlArray *>());
-//        for(int channel = this->settings->scope.voltage.count(); channel < this->vaChannel[mode].count(); ++channel)
-//            this->vaChannel[mode].removeLast();
-//    }
 
     // Set digital phosphor depth to one if we don't use it
     if(this->settings->view.digitalPhosphor)
@@ -291,28 +280,22 @@ void GlGenerator::emulateGraphs() {
 
                         // Check if the sample count has changed
 
-                       // unsigned int neededSize = 40; // this->settings->scope.horizontal.samplerate * 2;
-                       // unsigned int neededSize = this->settings->scope.horizontal.samplerate * 2;
                         // unsigned int neededSize = ((mode == Dso::CHANNELMODE_VOLTAGE) ? this->dataAnalyzer->data(channel)->samples.voltage.count : this->dataAnalyzer->data(channel)->samples.spectrum.count) * 2;
 
 //                        for(int index = 0; index < this->digitalPhosphorDepth; ++index) {
 //                            if(this->vaEmulated[channel]->getSize() != neededSize)
 //                                this->vaEmulated[channel]->setSize(0);
 //                        }
-
-                        // Check if the array is allocated
-                       // if(!this->vaEmulated[0].data)
-                       //     this->vaEmulated[0].setSize(neededSize);
-                        //this->vaChannel[mode][channel].first()->setSize(20);
-                       // GLfloat *vaNewChannel = this->vaChannel[mode][channel].first()->data;
-
                         // What's the horizontal distance between sampling points?
+
                         double horizontalFactor;
+
                       //  if(mode == Dso::CHANNELMODE_VOLTAGE)
 
                            // horizontalFactor = this->dataAnalyzer->data(channel)->samples.voltage.interval / this->settings->scope.horizontal.timebase;
-                           // horizontalFactor = (0.000000001) / this->settings->scope.horizontal.timebase;
-                        horizontalFactor = 0.1;
+
+                        horizontalFactor = this->settings->scope.horizontal.timebase;
+
                        // else
 
                           //  horizontalFactor = this->dataAnalyzer->data(channel)->samples.spectrum.interval / this->settings->scope.horizontal.frequencybase;
@@ -323,65 +306,24 @@ void GlGenerator::emulateGraphs() {
 
 //                            unsigned int arrayPosition = 0;
 //                            float values[neededSize];
-//                            int temp3 = neededSize / 2;
 //                               for(unsigned int position = 0; position < neededSize / 2; ++position) {
-//                                float temp1 = (float) position * horizontalFactor - 1;
-//                                float temp2 = (sin((float) position * horizontalFactor) / this->settings->scope.voltage[0].gain + this->settings->scope.voltage[0].offset);
-//                                 values[arrayPosition++] = (float) position * horizontalFactor - 1;
-//                                values[arrayPosition++] = (sin((float) position * horizontalFactor) / this->settings->scope.voltage[0].gain + this->settings->scope.voltage[0].offset);
-////
+//
                                  // values[arrayPosition++] = (float) position / (neededSize / 2) ;
 
                                // values[arrayPosition++] = (float) sin(position/ (neededSize / 2));
-                               //int arrayPosition = 0;
-                              // float values[neededSize];
+
+
+
+
                                 vaEmu.clear();
                                 float x =-1.0;
-                                float y = -1.0;
-                                for(int i=0; i<20; i++)
+                                for(int i=0; i<5000; i++)
                                     {
                                     vaEmu << x;
                                     x += horizontalFactor;
-                                    vaEmu << y / this->settings->scope.voltage[0].gain + this->settings->scope.voltage[0].offset;
-                                    y = -y;
-                                    //values[arrayPosition++] = (sin((float) position * horizontalFactor) / this->settings->scope.voltage[0].gain + this->settings->scope.voltage[0].offset);
-
-
+                                    vaEmu << sin((float)i/10) / this->settings->scope.voltage[0].gain + this->settings->scope.voltage[0].offset/(DIVS_VOLTAGE/2);
                                     }
 
-
-
-                       // Fill vector array
-
-//                            float values[] = {
-//                                -1.00, -0.50,
-//                                -0.80, 0.50,
-//                                -0.60, -0.50,
-//                                -0.40, 0.50,
-//                                -0.20, -0.50,
-//                                0.00, 0.50,
-//                                0.20, -0.50,
-//                                0.40, 0.50,
-//                                0.60, -0.50,
-//                                0.80, 0.50,
-//                                1.00, -0.50
-//                            };
-
-//
-                           //this->vaEmulated[0].data = values;
-                           //     for(int i=0; i< 40; i++)
-                            //        qDebug("%f",this->vaEmulated[0].data[i]);
-                            //this->vaChannel[mode][channel][0]->data = values;
-
-//                        unsigned int arrayPosition = 0;
-//                       // if(mode == Dso::CHANNELMODE_VOLTAGE) {
-//                            for(unsigned int position = 0; position < 5120; ++position) {
-//                                double temp1 = position * horizontalFactor - DIVS_TIME / 2;
-//                                vaNewChannel[arrayPosition++] = position * horizontalFactor - DIVS_TIME / 2;
-//                                vaNewChannel[arrayPosition++] = 5.6 - DIVS_TIME / 2;
-//                                double temp2 = 0.4 / this->settings->scope.voltage[channel].gain + this->settings->scope.voltage[channel].offset;
-//                                vaNewChannel[arrayPosition++] = 0.4 / this->settings->scope.voltage[channel].gain + this->settings->scope.voltage[channel].offset;
-//                            }
 
                       // }
                       // else {
@@ -442,8 +384,6 @@ void GlGenerator::emulateGraphs() {
         default:
             break;
     }
-
-   // this->dataAnalyzer->mutex()->unlock();
 
     emit graphsGenerated();
 }

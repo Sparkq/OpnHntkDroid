@@ -1,54 +1,13 @@
-/****************************************************************************
-**
-** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
-**
-** This file is part of the demonstration applications of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:LGPL21$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia. For licensing terms and
-** conditions see http://qt.digia.com/licensing. For further information
-** use the contact form at http://qt.digia.com/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights. These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
-
-#include "viewer.h"
-
 #include <QtQuick/qquickwindow.h>
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtGui/QOpenGLContext>
-
 #include <cmath>
-
 #include <QColor>
 #include <QDebug>
-
-
-
 #include "dataanalyzer.h"
 #include "glgenerator.h"
 #include "settings.h"
 #include "hardcontrol.h"
-
 #include "configdialog.h"
 #include "dataanalyzer.h"
 #include "dockwindows.h"
@@ -56,13 +15,12 @@
 #include "viewer.h"
 #include "settings.h"
 #include "hantek/control.h"
-
 #include "requests.h"
 
 Viewer::Viewer()
-    : m_t(0)
-    , m_renderer(0)
+
 {
+    this->m_renderer = 0;
     // Create the controller for the oscilloscope, provides channel count for settings
     this->dsoControl = new Hantek::Control();
 
@@ -207,10 +165,25 @@ void Viewer::samplerateSelected(float samplerate ) {
 }
 
 ///// \brief Sets the record time of the oscilloscope.
-void Viewer::timebaseSelected(float timebase) {
+void Viewer::timebaseSelected(int value, int power) {
+    float timebase = (float) value * qPow(10,power);
     if(timebase)
         this->settings->scope.horizontal.timebase = timebase;
     this->dsoControl->setRecordTime(this->settings->scope.horizontal.timebase * DIVS_TIME);
+}
+void Viewer::offsetSelected(unsigned int channel,float value ) {
+    if(channel < this->settings->scope.voltage.count()) {
+        this->settings->scope.voltage[channel].offset = value * (DIVS_VOLTAGE/2);
+
+
+//		if(channel < (int) this->settings->scope.physicalChannels)
+//			this->adaptTriggerLevelSlider(channel);
+    }
+//	else if(channel < this->settings->scope.voltage.count() * 2)
+//		this->settings->scope.spectrum[channel - this->settings->scope.voltage.count()].offset = value;
+
+//	emit offsetChanged(channel, value);
+    this->dsoControl->setOffset(channel, (this->settings->scope.voltage[channel].offset / DIVS_VOLTAGE) + 0.5);
 }
 
 //void Viewer::horizontalFormatSelected(unsigned long recordLength) {
@@ -234,48 +207,7 @@ void Viewer::emulateSelected(bool emulate) {
     this->m_renderer = 0;
     this->sync();
 
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ///// \brief The oscilloscope started sampling.
 //void Viewer::started() {
@@ -297,13 +229,6 @@ void Viewer::emulateSelected(bool emulate) {
 //    connect(this->startStopAction, SIGNAL(triggered()), this->dsoControl, SLOT(startSampling()));
 //}
 
-
-
-
-
-
-
-
 void Viewer::update()
 {
     this->m_renderer->vaEmulated[0].setSize(this->generator->vaEmu.size());
@@ -315,22 +240,19 @@ void Viewer::update()
 }
 
 
-
 void Viewer::handleWindowChanged(QQuickWindow *win)
 {
     if (win) {
         connect(win, SIGNAL(beforeSynchronizing()), this, SLOT(sync()), Qt::DirectConnection);
         connect(win, SIGNAL(sceneGraphInvalidated()), this, SLOT(cleanup()), Qt::DirectConnection);
-//! [1]
+
         // If we allow QML to do the clearing, they would clear what we paint
         // and nothing would show.
-//! [3]
         win->setClearBeforeRendering(false);
     }
 }
-//! [3]
 
-//! [6]
+
 void Viewer::cleanup()
 {
     if (m_renderer) {
@@ -338,23 +260,25 @@ void Viewer::cleanup()
         m_renderer = 0;
     }
 }
+
 ViewerRenderer::ViewerRenderer (DsoSettings *settings,bool emulate) {
     this->emulate = emulate;
     this->settings = settings;
 
     this->generator = 0;
-    m_t = 0;
+
     m_program = 0;
     //this->zoomed = false;
 }
+
 ViewerRenderer::~ViewerRenderer()
 {
     delete m_program;
     this->generator = 0;
 }
-//! [6]
 
-//! [9]
+
+
 void Viewer::sync()
 {
 
@@ -362,7 +286,6 @@ void Viewer::sync()
         this->generator = new GlGenerator(this->settings, this, this->emulate);
         this->generator->setDataAnalyzer(this->dataAnalyzer);
         m_renderer = new ViewerRenderer( this->settings, this->emulate);
-       // m_renderer->setGenerator(this->generator);
 
         m_renderer->generator = generator;
         connect(m_renderer->generator, SIGNAL(graphsGenerated()), this, SLOT(update()), Qt::DirectConnection);
@@ -370,11 +293,8 @@ void Viewer::sync()
         connect(window(), SIGNAL(beforeRendering()), m_renderer, SLOT(paint()), Qt::DirectConnection);
     }
     m_renderer->setViewportSize(window()->size() * window()->devicePixelRatio());
-    //m_renderer->setT(m_t);
-}
 
-void ViewerRenderer::setGenerator(GlGenerator *generator) {
-    }
+}
 
 
 void ViewerRenderer::paint()
@@ -403,27 +323,9 @@ void ViewerRenderer::paint()
         m_program->link();
 
     }
-//! [4] //! [5]
     m_program->bind();
 
     m_program->enableAttributeArray(0);
-//    float values[] = {
-//        0, 0,
-//        -0.005, -0.005,
-//        0, 0.005,
-//        0.005, 0.005
-//    };
-
-//    values[3] = (rand()%100)*-0.005;
-//    values[4] = (rand()%100)*-0.005;
-//    values[6] = (rand()%100)*0.005;
-//    values[7] = (rand()%100)*0.005;
-//    values[8] = (rand()%100)*0.005;
-
-
-//    m_program->setAttributeArray(0, GL_FLOAT, values, 2);
-
-//    m_program->setUniformValue(1, QColor(0,255,0,255));
 
     glViewport(0, 0, m_viewportSize.width(), m_viewportSize.height());
 
@@ -435,9 +337,7 @@ void ViewerRenderer::paint()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-//    glDrawArrays(GL_POINTS, 0, 4);
 
-//    m_program->disableAttributeArray(0);
     // Draw the graphs
     if(this->generator && this->generator->digitalPhosphorDepth > 0) {
         //if(this->settings->view.antialiasing) {
@@ -520,9 +420,11 @@ void ViewerRenderer::paint()
         {
 
 
-                m_program->setUniformValue(1, QColor(255,255,255,255));
+                m_program->setUniformValue(1, QColor(255,0,0,255));
+
            // for(int i=0; i< 40; i++)
             //    qDebug("%f",this->vaEmulated[0].data[i]);
+
             m_program->setAttributeArray(0, GL_FLOAT, this->vaEmulated[0].data, 2);
 
             glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->vaEmulated[0].getSize() / 2);
@@ -558,4 +460,3 @@ void ViewerRenderer::paint()
 
     }
 }
-//! [5]
