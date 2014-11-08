@@ -143,6 +143,7 @@ void GlGenerator::generateGraphs() {
 	}
 	
 	this->dataAnalyzer->mutex()->lock();
+
 	
 	switch(this->settings->scope.horizontal.format) {
 		case Dso::GRAPHFORMAT_TY:
@@ -172,17 +173,26 @@ void GlGenerator::generateGraphs() {
 							horizontalFactor = this->dataAnalyzer->data(channel)->samples.spectrum.interval / this->settings->scope.horizontal.frequencybase;
 						
 						// Fill vector array
-						unsigned int arrayPosition = 0;
+                        vaCha[channel].clear();
+
+                        //unsigned int arrayPosition = 0;
 						if(mode == Dso::CHANNELMODE_VOLTAGE) {
 							for(unsigned int position = 0; position < this->dataAnalyzer->data(channel)->samples.voltage.count; ++position) {
-								vaNewChannel[arrayPosition++] = position * horizontalFactor - DIVS_TIME / 2;
-								vaNewChannel[arrayPosition++] = this->dataAnalyzer->data(channel)->samples.voltage.sample[position] / this->settings->scope.voltage[channel].gain + this->settings->scope.voltage[channel].offset;
+                                //vaNewChannel[arrayPosition++] = position * horizontalFactor - DIVS_TIME / 2;
+                                vaCha[channel] << (position * horizontalFactor - DIVS_TIME / 2)/(DIVS_TIME/2);
+                               // qDebug("%f",(position * horizontalFactor - DIVS_TIME / 2)/(DIVS_TIME/2));
+                                //vaNewChannel[arrayPosition++] = this->dataAnalyzer->data(channel)->samples.voltage.sample[position] / this->settings->scope.voltage[channel].gain + this->settings->scope.voltage[channel].offset;
+                                vaCha[channel] << (this->dataAnalyzer->data(channel)->samples.voltage.sample[position] / this->settings->scope.voltage[channel].gain + this->settings->scope.voltage[channel].offset)/(DIVS_VOLTAGE/2);
+
+                                //qDebug("%f",(this->dataAnalyzer->data(channel)->samples.voltage.sample[position] / this->settings->scope.voltage[channel].gain + this->settings->scope.voltage[channel].offset)/(DIVS_VOLTAGE/2));
 							}
 						}
 						else {
 							for(unsigned int position = 0; position < this->dataAnalyzer->data(channel)->samples.spectrum.count; ++position) {
-								vaNewChannel[arrayPosition++] = position * horizontalFactor - DIVS_TIME / 2;
-								vaNewChannel[arrayPosition++] = this->dataAnalyzer->data(channel)->samples.spectrum.sample[position] / this->settings->scope.spectrum[channel].magnitude + this->settings->scope.spectrum[channel].offset;
+                            //	vaNewChannel[arrayPosition++] = position * horizontalFactor - DIVS_TIME / 2;
+                            vaCha[channel] << (position * horizontalFactor - DIVS_TIME / 2)/(DIVS_TIME/2);
+                                //	vaNewChannel[arrayPosition++] = this->dataAnalyzer->data(channel)->samples.spectrum.sample[position] / this->settings->scope.spectrum[channel].magnitude + this->settings->scope.spectrum[channel].offset;
+                            vaCha[channel] << (this->dataAnalyzer->data(channel)->samples.spectrum.sample[position] / this->settings->scope.spectrum[channel].magnitude + this->settings->scope.spectrum[channel].offset)/(DIVS_VOLTAGE/2);
 							}
 						}
 					}
@@ -195,43 +205,43 @@ void GlGenerator::generateGraphs() {
 			}
 			break;
 			
-		case Dso::GRAPHFORMAT_XY:
-			for(int channel = 0; channel < this->settings->scope.voltage.count(); ++channel) {
-				// For even channel numbers check if this channel is used and this and the following channel are available at the data analyzer
-				if(channel % 2 == 0 && channel + 1 < this->settings->scope.voltage.count() && this->settings->scope.voltage[channel].used && this->dataAnalyzer->data(channel) && this->dataAnalyzer->data(channel)->samples.voltage.sample && this->dataAnalyzer->data(channel + 1) && this->dataAnalyzer->data(channel + 1)->samples.voltage.sample) {
-					// Check if the sample count has changed
-					unsigned int neededSize = qMin(this->dataAnalyzer->data(channel)->samples.voltage.count, this->dataAnalyzer->data(channel + 1)->samples.voltage.count) * 2;
-					for(int index = 0; index < this->digitalPhosphorDepth; ++index) {
-						if(this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->getSize() != neededSize)
-							this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->setSize(0);
-					}
+//		case Dso::GRAPHFORMAT_XY:
+//			for(int channel = 0; channel < this->settings->scope.voltage.count(); ++channel) {
+//				// For even channel numbers check if this channel is used and this and the following channel are available at the data analyzer
+//				if(channel % 2 == 0 && channel + 1 < this->settings->scope.voltage.count() && this->settings->scope.voltage[channel].used && this->dataAnalyzer->data(channel) && this->dataAnalyzer->data(channel)->samples.voltage.sample && this->dataAnalyzer->data(channel + 1) && this->dataAnalyzer->data(channel + 1)->samples.voltage.sample) {
+//					// Check if the sample count has changed
+//					unsigned int neededSize = qMin(this->dataAnalyzer->data(channel)->samples.voltage.count, this->dataAnalyzer->data(channel + 1)->samples.voltage.count) * 2;
+//					for(int index = 0; index < this->digitalPhosphorDepth; ++index) {
+//						if(this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->getSize() != neededSize)
+//							this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->setSize(0);
+//					}
 					
-					// Check if the array is allocated
-					if(!this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel].first()->data)
-						this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel].first()->setSize(neededSize);
+//					// Check if the array is allocated
+//					if(!this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel].first()->data)
+//						this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel].first()->setSize(neededSize);
 					
-					GLfloat *vaNewChannel = this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel].first()->data;
+//					GLfloat *vaNewChannel = this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel].first()->data;
 					
-					// Fill vector array
-					unsigned int arrayPosition = 0;
-					unsigned int xChannel = channel;
-					unsigned int yChannel = channel + 1;
-					for(unsigned int position = 0; position < this->dataAnalyzer->data(channel)->samples.voltage.count; ++position) {
-						vaNewChannel[arrayPosition++] = this->dataAnalyzer->data(xChannel)->samples.voltage.sample[position] / this->settings->scope.voltage[xChannel].gain + this->settings->scope.voltage[xChannel].offset;
-						vaNewChannel[arrayPosition++] = this->dataAnalyzer->data(yChannel)->samples.voltage.sample[position] / this->settings->scope.voltage[yChannel].gain + this->settings->scope.voltage[yChannel].offset;
-					}
-				}
-				else {
-					// Delete all vector arrays
-					for(int index = 0; index < this->digitalPhosphorDepth; ++index)
-						this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->setSize(0);
-				}
+//					// Fill vector array
+//					unsigned int arrayPosition = 0;
+//					unsigned int xChannel = channel;
+//					unsigned int yChannel = channel + 1;
+//					for(unsigned int position = 0; position < this->dataAnalyzer->data(channel)->samples.voltage.count; ++position) {
+//						vaNewChannel[arrayPosition++] = this->dataAnalyzer->data(xChannel)->samples.voltage.sample[position] / this->settings->scope.voltage[xChannel].gain + this->settings->scope.voltage[xChannel].offset;
+//						vaNewChannel[arrayPosition++] = this->dataAnalyzer->data(yChannel)->samples.voltage.sample[position] / this->settings->scope.voltage[yChannel].gain + this->settings->scope.voltage[yChannel].offset;
+//					}
+//				}
+//				else {
+//					// Delete all vector arrays
+//					for(int index = 0; index < this->digitalPhosphorDepth; ++index)
+//						this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->setSize(0);
+//				}
 				
-				// Delete all spectrum graphs
-				for(int index = 0; index < this->digitalPhosphorDepth; ++index)
-					this->vaChannel[Dso::CHANNELMODE_SPECTRUM][channel][index]->setSize(0);
-			}
-			break;
+//				// Delete all spectrum graphs
+//				for(int index = 0; index < this->digitalPhosphorDepth; ++index)
+//					this->vaChannel[Dso::CHANNELMODE_SPECTRUM][channel][index]->setSize(0);
+//			}
+//			break;
 		
 		default:
 			break;

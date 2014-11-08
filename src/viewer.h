@@ -22,6 +22,7 @@ class DsoControl;
 class ViewerRenderer : public QObject, public QOpenGLFunctions
 {
     Q_OBJECT
+
 public:
     ViewerRenderer(DsoSettings *settings, bool emulate);
 
@@ -32,6 +33,7 @@ public:
     void setViewportSize(const QSize &size) { m_viewportSize = size; }
     //GlArray vaGrid[3];
     GlArray vaEmulated[2];
+    GlArray vaChannel[1][2][1];
 
 public slots:
     void paint();
@@ -50,11 +52,13 @@ private:
 class Viewer : public QQuickItem
 {
     Q_OBJECT
-
+    Q_PROPERTY(QString message READ message)
 
 public:
     Viewer();
     bool emulate = false;
+    QString message() {return m_message;}
+
 
 
     GlGenerator *generator; ///< The generator for the OpenGL vertex arrays
@@ -65,6 +69,7 @@ public:
     DataAnalyzer *dataAnalyzer; ///< The data source provided by the main window
     HardControl *hardControl;
     DsoControl *dsoControl;
+    QString m_message;
     void connectSignals();
     void initializeDevice();
 
@@ -84,7 +89,7 @@ public slots:
    // void started();
    // void stopped();
     // Hard Events
-    //void hard_event(int type, int value);
+    void hard_event(int type, int value);
     // Other
    // void config();
    // void about();
@@ -101,11 +106,19 @@ public slots:
     void voltageGainSelected(unsigned int channel, int index);
     void updateUsed(unsigned int channel);
     void emulateSelected(bool emulate);
+    void showMessage(QString str, int);
+
+
+signals:
+   void settMessage();
+
+
 
 private:
     ViewerRenderer *m_renderer;
 
 };
+//QML_DECLARE_TYPEINFO(Viewer, QML_HAS_ATTACHED_PROPERTIES)
 
 
 #endif

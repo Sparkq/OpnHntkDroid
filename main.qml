@@ -85,12 +85,24 @@ ApplicationWindow {
 //        }
         Viewer {
             id: oscill
+
+
+            onSettMessage: mesg.text = message
            // SequentialAnimation  {
                // NumberAnimation { to: 1; duration: 100; easing.type: Easing.InQuad }
                // NumberAnimation { to: 0; duration: 100; easing.type: Easing.OutQuad }
                // loops: Animation.Infinite
                // running: true
           //  }
+        }
+        Label   {
+            id:mesg
+            anchors.bottom: parent.bottom
+            text: oscill.message
+            color: "white"
+
+
+
         }
 }
 

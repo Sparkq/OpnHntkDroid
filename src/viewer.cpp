@@ -20,6 +20,7 @@
 Viewer::Viewer()
 
 {
+    m_message = "test";
     this->m_renderer = 0;
     // Create the controller for the oscilloscope, provides channel count for settings
     this->dsoControl = new Hantek::Control();
@@ -27,6 +28,7 @@ Viewer::Viewer()
     // Application settings
     this->settings = new DsoSettings();
     this->settings->setChannelCount(this->dsoControl->getChannelCount());
+
     // The data analyzer
     this->dataAnalyzer = new DataAnalyzer(this->settings);
 
@@ -56,7 +58,7 @@ void Viewer::connectSignals() {
     // Connect general signals
     //connect(this, SIGNAL(settingsChanged()), this, SLOT(applySettings()));
     //connect(this->dsoWidget, SIGNAL(stopped()), this, SLOT(stopped()));
-    //connect(this->dsoControl, SIGNAL(statusMessage(QString, int)), this->statusBar(), SLOT(showMessage(QString, int)));
+    connect(this->dsoControl, SIGNAL(statusMessage(QString, int)), this, SLOT(showMessage(QString, int)));
     connect(this->dsoControl, SIGNAL(samplesAvailable(const QList<double *> *, const QList<unsigned int> *, double, QMutex *)), this->dataAnalyzer, SLOT(analyze(const QList<double *> *, const QList<unsigned int> *, double, QMutex *)));
 
     // Connect signals to DSO controller and widget
@@ -95,9 +97,9 @@ void Viewer::connectSignals() {
 
     // Started/stopped signals from oscilloscope
    // connect(this->dsoControl, SIGNAL(samplingStarted()), this, SLOT(started()));
-   // connect(this->dsoControl, SIGNAL(samplingStarted()), this->hardControl, SLOT(started()));
+    connect(this->dsoControl, SIGNAL(samplingStarted()), this->hardControl, SLOT(started()));
    // connect(this->dsoControl, SIGNAL(samplingStopped()), this, SLOT(stopped()));
-    //connect(this->dsoControl, SIGNAL(samplingStopped()), this->hardControl, SLOT(stopped()));
+    connect(this->dsoControl, SIGNAL(samplingStopped()), this->hardControl, SLOT(stopped()));
 
     //connect(this->dsoControl, SIGNAL(recordLengthChanged(unsigned long)), this, SLOT(recordLengthChanged()));
     //connect(this->dsoControl, SIGNAL(recordTimeChanged(double)), this, SLOT(recordTimeChanged(double)));
@@ -107,8 +109,8 @@ void Viewer::connectSignals() {
    // connect(this->dsoControl, SIGNAL(samplerateLimitsChanged(double, double)), this->horizontalDock, SLOT(samplerateLimitsChanged(double, double)));
 
     // Hard Events
-    //connect(this->hardControl, SIGNAL(new_event(int, int)), this, SLOT(hard_event(int, int)));
-    //connect(this->hardControl, SIGNAL(new_event(int, int)), this, SLOT(hard_event(int, int)));
+    connect(this->hardControl, SIGNAL(new_event(int, int)), this, SLOT(hard_event(int, int)));
+    //connect(this->hardControl, SIGNAL(new_event(int, int)), this->dsoWidget, SLOT(hard_event(int, int)));
     //connect(this->hardControl, SIGNAL(new_event(int, int)), this->horizontalDock, SLOT(hard_event(int, int)));
     //connect(this->hardControl, SIGNAL(new_event(int, int)), this->triggerDock, SLOT(hard_event(int, int)));
     //connect(this->hardControl, SIGNAL(new_event(int, int)), this->voltageDock, SLOT(hard_event(int, int)));
@@ -209,6 +211,53 @@ void Viewer::emulateSelected(bool emulate) {
 
 }
 
+void Viewer::showMessage(QString str, int) {
+    m_message = str;
+    emit settMessage();
+}
+
+void Viewer::hard_event(int type, int value) {
+    int i;
+
+    switch (type) {
+    case PANEL_SW_R_RUN_STOP:
+       // startStopAction->activate(QAction::Trigger);
+        break;
+    case PANEL_SW_H_TIMEBASE:
+       // zoomAction->activate(QAction::Trigger);
+        break;
+    case PANEL_SW_R_DEFAULT:
+       // horizontalDock->setSamplerate(1e6);
+       // horizontalDock->setTimebase(1e-3);
+       // horizontalDock->setFrequencybase(1e3);
+#if 0
+        horizontalDock->setRecordLength();
+#endif
+       // horizontalDock->setFormat(Dso::GRAPHFORMAT_TY);
+       // triggerDock->setMode(Dso::TRIGGERMODE_AUTO);
+       // triggerDock->setSource(false, 0);
+       // triggerDock->setSlope(Dso::SLOPE_POSITIVE);
+
+       // for (i = 0; i < HANTEK_CHANNELS; i++) {
+       //     voltageDock->setCoupling(i, Dso::COUPLING_DC);
+       //     voltageDock->setGain(i, 1);
+       //     voltageDock->setUsed(i, 1);
+       // }
+       // voltageDock->setUsed(HANTEK_CHANNELS, 0);
+       // voltageDock->setGain(HANTEK_CHANNELS, 1);
+       // voltageDock->setMode(Dso::MATHMODE_1ADD2);
+
+        break;
+    case PANEL_SW_T_MANUAL:
+        this->dsoControl->forceTrigger();
+        break;
+    }
+}
+
+
+
+
+
 ///// \brief The oscilloscope started sampling.
 //void Viewer::started() {
 //    this->startStopAction->setText(tr("&Stop"));
@@ -232,9 +281,17 @@ void Viewer::emulateSelected(bool emulate) {
 void Viewer::update()
 {
     this->m_renderer->vaEmulated[0].setSize(this->generator->vaEmu.size());
-   // memcpy(this->m_renderer->vaEmulated[0].data,this->generator->vaEmulated[0].data, sizeof(float)*this->generator->vaEmulated[0].getSize() );
+
     for (int i = 0; i< this->generator->vaEmu.size(); i++)
         this->m_renderer->vaEmulated[0].data[i] = this->generator->vaEmu.at(i);
+    for (int j = 0; j< 2; j++)
+    {
+    this->m_renderer->vaChannel[0][j][0].setSize(this->generator->vaCha[j].size());
+
+    for (int i = 0; i< this->generator->vaCha[j].size(); i++)
+        this->m_renderer->vaChannel[0][j][0].data[i] = this->generator->vaCha[j].at(i);
+    }
+
     if (window())
         window()->update();
 }
@@ -371,17 +428,21 @@ void ViewerRenderer::paint()
 
                              for(int index = this->generator->digitalPhosphorDepth - 1; index >= 0; index--) {
 
-                            if(this->generator->vaChannel[mode][channel][index]->data) {
+                           if(this->vaChannel[mode][channel][index].data) {
                                 if(mode == Dso::CHANNELMODE_VOLTAGE)
                                     m_program->setUniformValue(1, QColor(255,255,0,255));
                                     //this->qglColor(this->settings->view.color.screen.voltage[channel].darker(fadingFactor[index]));
                                 else
                                     m_program->setUniformValue(1, QColor(0,255,255,255));
                                 //this->qglColor(this->settings->view.color.screen.spectrum[channel].darker(fadingFactor[index]));
-//
-                                m_program->setAttributeArray(0, GL_FLOAT, this->generator->vaChannel[mode][channel][index]->data, 2);
+
+
+
+                                for(int i=0; i< 40; i++)
+                                     qDebug("%f",this->vaChannel[mode][channel][index].data[i]);
+                                m_program->setAttributeArray(0, GL_FLOAT, this->vaChannel[mode][channel][index].data, 2);
                                 //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaChannel[mode][channel][index]->data);
-                                glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->generator->vaChannel[mode][channel][index]->getSize() / 2);
+                                glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->vaChannel[mode][channel][index].getSize() / 2);
                             }
 
 
@@ -400,13 +461,13 @@ void ViewerRenderer::paint()
                 if(this->settings->scope.voltage[channel].used) {
                     // Draw graph for all available depths
                     for(int index =  this->generator->digitalPhosphorDepth - 1; index >= 0; index--) {
-                        if(this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->data) {
+                       // if(this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->data) {
                             m_program->setUniformValue(1, QColor(0,255,0,255));
                             //this->qglColor(this->settings->view.color.screen.voltage[channel].darker(fadingFactor[index]));
-                            m_program->setAttributeArray(0, GL_FLOAT, this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->data, 2);
+                            m_program->setAttributeArray(0, GL_FLOAT, this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index].data, 2);
                             //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->data);
-                            glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->getSize() / 2);
-                        }
+                            glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index].getSize() / 2);
+                      //  }
                     }
                 }
             }

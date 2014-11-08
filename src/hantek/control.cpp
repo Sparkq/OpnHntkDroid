@@ -38,6 +38,7 @@
 #include "types.h"
 
 
+
 namespace Hantek {
 	/// \brief Initializes the command buffers and lists.
 	/// \param parent The parent widget.

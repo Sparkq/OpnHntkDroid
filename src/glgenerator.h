@@ -82,6 +82,7 @@ class GlGenerator : public QObject {
         GlArray vaGrid[3];
         GlArray vaEmulated[2];
         QList<float> vaEmu;
+        QList<float> vaCha[2];
         bool emulate;
         void generateGrid();
 

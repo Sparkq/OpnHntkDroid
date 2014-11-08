@@ -236,6 +236,13 @@ Rectangle {
     }
 }
 
+
+
+
+
+
+
+
     Component {
         id: touchStyle
 

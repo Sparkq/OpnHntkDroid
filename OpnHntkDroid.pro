@@ -58,6 +58,9 @@ HEADERS += \
     src/sispinbox.h \
     src/viewer.h
 
+DEFINES += DEBUG
+
+
 unix:!macx: LIBS += -L$$PWD/libs/fftw3-armv7a/ -lfftw3
 
 INCLUDEPATH += $$PWD/libs/fftw3-armv7a
