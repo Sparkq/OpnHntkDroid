@@ -126,7 +126,7 @@ void Viewer::initializeDevice() {
         this->dsoControl->setTriggerLevel(channel, this->settings->scope.voltage[channel].trigger);
     }
 #endif
-    this->updateUsed(this->settings->scope.physicalChannels);
+    this->updateUsed(this->settings->scope.physicalChannels, true);
     if(this->settings->scope.horizontal.samplerateSet)
         this->samplerateSelected();
     else
@@ -145,9 +145,12 @@ void Viewer::initializeDevice() {
     //this->horizontalDock->samplerateLimitsChanged(this->dsoControl->getMinSamplerate(), this->dsoControl->getMaxSamplerate());
 }
 
-void Viewer::updateUsed(unsigned int channel) {
+void Viewer::updateUsed(unsigned int channel, bool checked) {
+
     if(channel >= (unsigned int) this->settings->scope.voltage.count())
         return;
+    else
+        this->settings->scope.voltage[channel].used = checked;
 
     bool mathUsed = this->settings->scope.voltage[this->settings->scope.physicalChannels].used | this->settings->scope.spectrum[this->settings->scope.physicalChannels].used;
 
@@ -158,6 +161,9 @@ void Viewer::updateUsed(unsigned int channel) {
     else if(channel == this->settings->scope.physicalChannels) {
         for(unsigned int channelCounter = 0; channelCounter < this->settings->scope.physicalChannels; ++channelCounter)
             this->dsoControl->setChannelUsed(channelCounter, mathUsed | this->settings->scope.voltage[channelCounter].used | this->settings->scope.spectrum[channelCounter].used);
+
+
+        this->hardControl->updateLEDs();
     }
 }
 void Viewer::samplerateSelected(float samplerate ) {
@@ -422,24 +428,29 @@ void ViewerRenderer::paint()
         case Dso::GRAPHFORMAT_TY:
             // Real and virtual channels
             for(int mode = Dso::CHANNELMODE_VOLTAGE; mode < Dso::CHANNELMODE_COUNT; ++mode) {
-                for(int channel = 0; channel < this->settings->scope.voltage.count(); ++channel) {
+                for(int channel = 0; channel < 2; ++channel) {
+                //for(int channel = 0; channel < this->settings->scope.voltage.count(); ++channel) {
                     if((mode == Dso::CHANNELMODE_VOLTAGE) ? this->settings->scope.voltage[channel].used : this->settings->scope.spectrum[channel].used) {
                         // Draw graph for all available depths
 
                              for(int index = this->generator->digitalPhosphorDepth - 1; index >= 0; index--) {
 
                            if(this->vaChannel[mode][channel][index].data) {
-                                if(mode == Dso::CHANNELMODE_VOLTAGE)
-                                    m_program->setUniformValue(1, QColor(255,255,0,255));
+                                //if(mode == Dso::CHANNELMODE_VOLTAGE)
+                                //    m_program->setUniformValue(1, QColor(255,255,0,255));
                                     //this->qglColor(this->settings->view.color.screen.voltage[channel].darker(fadingFactor[index]));
+                                //else
+                                //    m_program->setUniformValue(1, QColor(0,255,255,255));
+                                //this->qglColor(this->settings->view.color.screen.spectrum[channel].darker(fadingFactor[index]));
+                                if (channel == 0)
+                                    m_program->setUniformValue(1, QColor(255,255,0,255));
                                 else
                                     m_program->setUniformValue(1, QColor(0,255,255,255));
-                                //this->qglColor(this->settings->view.color.screen.spectrum[channel].darker(fadingFactor[index]));
 
 
 
-                                for(int i=0; i< 40; i++)
-                                     qDebug("%f",this->vaChannel[mode][channel][index].data[i]);
+                                //for(int i=0; i< 40; i++)
+                                //     qDebug("%f",this->vaChannel[mode][channel][index].data[i]);
                                 m_program->setAttributeArray(0, GL_FLOAT, this->vaChannel[mode][channel][index].data, 2);
                                 //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaChannel[mode][channel][index]->data);
                                 glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->vaChannel[mode][channel][index].getSize() / 2);
@@ -455,23 +466,23 @@ void ViewerRenderer::paint()
 
             break;
 
-        case Dso::GRAPHFORMAT_XY:
-            // Real and virtual channels
-            for(int channel = 0; channel < this->settings->scope.voltage.count() - 1; channel += 2) {
-                if(this->settings->scope.voltage[channel].used) {
-                    // Draw graph for all available depths
-                    for(int index =  this->generator->digitalPhosphorDepth - 1; index >= 0; index--) {
-                       // if(this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->data) {
-                            m_program->setUniformValue(1, QColor(0,255,0,255));
-                            //this->qglColor(this->settings->view.color.screen.voltage[channel].darker(fadingFactor[index]));
-                            m_program->setAttributeArray(0, GL_FLOAT, this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index].data, 2);
-                            //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->data);
-                            glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index].getSize() / 2);
-                      //  }
-                    }
-                }
-            }
-            break;
+//        case Dso::GRAPHFORMAT_XY:
+//            // Real and virtual channels
+//            for(int channel = 0; channel < this->settings->scope.voltage.count() - 1; channel += 2) {
+//                if(this->settings->scope.voltage[channel].used) {
+//                    // Draw graph for all available depths
+//                    for(int index =  this->generator->digitalPhosphorDepth - 1; index >= 0; index--) {
+//                       // if(this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->data) {
+//                            m_program->setUniformValue(1, QColor(0,255,0,255));
+//                            //this->qglColor(this->settings->view.color.screen.voltage[channel].darker(fadingFactor[index]));
+//                            m_program->setAttributeArray(0, GL_FLOAT, this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index].data, 2);
+//                            //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->data);
+//                            glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index].getSize() / 2);
+//                      //  }
+//                    }
+//                }
+//            }
+//            break;
 
         default:
             break;
@@ -481,7 +492,7 @@ void ViewerRenderer::paint()
         {
 
 
-                m_program->setUniformValue(1, QColor(255,0,0,255));
+                m_program->setUniformValue(1, QColor(255,255,255,255));
 
            // for(int i=0; i< 40; i++)
             //    qDebug("%f",this->vaEmulated[0].data[i]);

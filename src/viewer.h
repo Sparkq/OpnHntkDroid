@@ -104,7 +104,7 @@ public slots:
     void offsetSelected(unsigned int channel,float value );
    // void recordLengthSelected(unsigned long recordLength);
     void voltageGainSelected(unsigned int channel, int index);
-    void updateUsed(unsigned int channel);
+    void updateUsed(unsigned int channel, bool checked);
     void emulateSelected(bool emulate);
     void showMessage(QString str, int);
 

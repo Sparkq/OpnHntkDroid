@@ -112,12 +112,12 @@ void GlGenerator::generateGraphs() {
 		return;
 	
 	// Adapt the number of graphs
-	for(int mode = Dso::CHANNELMODE_VOLTAGE; mode < Dso::CHANNELMODE_COUNT; ++mode) {
-		for(int channel = this->vaChannel[mode].count(); channel < this->settings->scope.voltage.count(); ++channel)
-			this->vaChannel[mode].append(QList<GlArray *>());
-		for(int channel = this->settings->scope.voltage.count(); channel < this->vaChannel[mode].count(); ++channel)
-			this->vaChannel[mode].removeLast();
-	}
+//	for(int mode = Dso::CHANNELMODE_VOLTAGE; mode < Dso::CHANNELMODE_COUNT; ++mode) {
+//		for(int channel = this->vaChannel[mode].count(); channel < this->settings->scope.voltage.count(); ++channel)
+//			this->vaChannel[mode].append(QList<GlArray *>());
+//		for(int channel = this->settings->scope.voltage.count(); channel < this->vaChannel[mode].count(); ++channel)
+//			this->vaChannel[mode].removeLast();
+//	}
 	
 	// Set digital phosphor depth to one if we don't use it
 	if(this->settings->view.digitalPhosphor)
@@ -126,21 +126,21 @@ void GlGenerator::generateGraphs() {
 		this->digitalPhosphorDepth = 1;
 	
 	// Handle all digital phosphor related list manipulations
-	for(int mode = Dso::CHANNELMODE_VOLTAGE; mode < Dso::CHANNELMODE_COUNT; ++mode) {
-		for(int channel = 0; channel < this->vaChannel[mode].count(); ++channel) {
-			// Resize lists for vector array if the digital phosphor depth has changed
-			if(this->vaChannel[mode][channel].count() != this->digitalPhosphorDepth)
-			for(int index = this->vaChannel[mode][channel].count(); index < this->digitalPhosphorDepth; ++index)
-				this->vaChannel[mode][channel].append(new GlArray());
-			for(int index = this->digitalPhosphorDepth; index < this->vaChannel[mode][channel].count(); ++index) {
-				delete this->vaChannel[mode][channel].last();
-				this->vaChannel[mode][channel].removeLast();
-			}
+//	for(int mode = Dso::CHANNELMODE_VOLTAGE; mode < Dso::CHANNELMODE_COUNT; ++mode) {
+//		for(int channel = 0; channel < this->vaChannel[mode].count(); ++channel) {
+//			// Resize lists for vector array if the digital phosphor depth has changed
+//			if(this->vaChannel[mode][channel].count() != this->digitalPhosphorDepth)
+//			for(int index = this->vaChannel[mode][channel].count(); index < this->digitalPhosphorDepth; ++index)
+//				this->vaChannel[mode][channel].append(new GlArray());
+//			for(int index = this->digitalPhosphorDepth; index < this->vaChannel[mode][channel].count(); ++index) {
+//				delete this->vaChannel[mode][channel].last();
+//				this->vaChannel[mode][channel].removeLast();
+//			}
 			
-			// Move the last list element to the front
-			this->vaChannel[mode][channel].move(this->digitalPhosphorDepth -1, 0);
-		}
-	}
+//			// Move the last list element to the front
+//			this->vaChannel[mode][channel].move(this->digitalPhosphorDepth -1, 0);
+//		}
+//	}
 	
 	this->dataAnalyzer->mutex()->lock();
 
@@ -149,21 +149,22 @@ void GlGenerator::generateGraphs() {
 		case Dso::GRAPHFORMAT_TY:
 			// Add graphs for channels
 			for(int mode = Dso::CHANNELMODE_VOLTAGE; mode < Dso::CHANNELMODE_COUNT; ++mode) {
-				for(int channel = 0; channel < this->settings->scope.voltage.count(); ++channel) {
+                for(int channel = 0; channel < 2; ++channel) {
+                //for(int channel = 0; channel < this->settings->scope.voltage.count(); ++channel) {
 					// Check if this channel is used and available at the data analyzer
 					if(((mode == Dso::CHANNELMODE_VOLTAGE) ? this->settings->scope.voltage[channel].used : this->settings->scope.spectrum[channel].used) && this->dataAnalyzer->data(channel) && this->dataAnalyzer->data(channel)->samples.voltage.sample) {
 						// Check if the sample count has changed
-						unsigned int neededSize = ((mode == Dso::CHANNELMODE_VOLTAGE) ? this->dataAnalyzer->data(channel)->samples.voltage.count : this->dataAnalyzer->data(channel)->samples.spectrum.count) * 2;
-						for(int index = 0; index < this->digitalPhosphorDepth; ++index) {
-							if(this->vaChannel[mode][channel][index]->getSize() != neededSize)
-								this->vaChannel[mode][channel][index]->setSize(0);
-						}
+                        //unsigned int neededSize = ((mode == Dso::CHANNELMODE_VOLTAGE) ? this->dataAnalyzer->data(channel)->samples.voltage.count : this->dataAnalyzer->data(channel)->samples.spectrum.count) * 2;
+                        //for(int index = 0; index < this->digitalPhosphorDepth; ++index) {
+                        //	if(this->vaChannel[mode][channel][index]->getSize() != neededSize)
+                        //		this->vaChannel[mode][channel][index]->setSize(0);
+                        //}
 						
 						// Check if the array is allocated
-						if(!this->vaChannel[mode][channel].first()->data)
-							this->vaChannel[mode][channel].first()->setSize(neededSize);
+                        //if(!this->vaChannel[mode][channel].first()->data)
+                        //	this->vaChannel[mode][channel].first()->setSize(neededSize);
 						
-						GLfloat *vaNewChannel = this->vaChannel[mode][channel].first()->data;
+                        //GLfloat *vaNewChannel = this->vaChannel[mode][channel].first()->data;
 						
 						// What's the horizontal distance between sampling points?
 						double horizontalFactor;
@@ -180,12 +181,14 @@ void GlGenerator::generateGraphs() {
 							for(unsigned int position = 0; position < this->dataAnalyzer->data(channel)->samples.voltage.count; ++position) {
                                 //vaNewChannel[arrayPosition++] = position * horizontalFactor - DIVS_TIME / 2;
                                 vaCha[channel] << (position * horizontalFactor - DIVS_TIME / 2)/(DIVS_TIME/2);
-                               // qDebug("%f",(position * horizontalFactor - DIVS_TIME / 2)/(DIVS_TIME/2));
+
                                 //vaNewChannel[arrayPosition++] = this->dataAnalyzer->data(channel)->samples.voltage.sample[position] / this->settings->scope.voltage[channel].gain + this->settings->scope.voltage[channel].offset;
                                 vaCha[channel] << (this->dataAnalyzer->data(channel)->samples.voltage.sample[position] / this->settings->scope.voltage[channel].gain + this->settings->scope.voltage[channel].offset)/(DIVS_VOLTAGE/2);
-
-                                //qDebug("%f",(this->dataAnalyzer->data(channel)->samples.voltage.sample[position] / this->settings->scope.voltage[channel].gain + this->settings->scope.voltage[channel].offset)/(DIVS_VOLTAGE/2));
-							}
+                                //if(channel == 1) {
+                               // qDebug("%f",(position * horizontalFactor - DIVS_TIME / 2)/(DIVS_TIME/2));
+                               // qDebug("%f",(this->dataAnalyzer->data(channel)->samples.voltage.sample[position] / this->settings->scope.voltage[channel].gain + this->settings->scope.voltage[channel].offset)/(DIVS_VOLTAGE/2));
+                               // }
+                                }
 						}
 						else {
 							for(unsigned int position = 0; position < this->dataAnalyzer->data(channel)->samples.spectrum.count; ++position) {
@@ -196,11 +199,11 @@ void GlGenerator::generateGraphs() {
 							}
 						}
 					}
-					else {
+                    //else {
 						// Delete all vector arrays
-						for(int index = 0; index < this->digitalPhosphorDepth; ++index)
-							this->vaChannel[mode][channel][index]->setSize(0);
-					}
+                    //	for(int index = 0; index < this->digitalPhosphorDepth; ++index)
+                    //		this->vaChannel[mode][channel][index]->setSize(0);
+                    //}
 				}
 			}
 			break;

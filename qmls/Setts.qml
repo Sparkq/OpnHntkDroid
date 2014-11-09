@@ -117,31 +117,52 @@ Rectangle {
             text: "1"
             color: "white"
         }
+        Label   {
+            text: "*"
+            color: "white"
+        }
+        ComboBox {
+            id : tens
+            currentIndex: 0
+            model: ["1", "10", "100", "1000"]
+            onCurrentIndexChanged: oscill.timebaseSelected(sliderbase.value, currentIndex+3*(base.currentIndex-3))
+            onActivated: oscill.timebaseSelected(sliderbase.value, currentIndex+3*(base.currentIndex-3))
+        }
+
         ComboBox {
             id : base
-            currentIndex: 2
+            currentIndex: 1
             model: ["ns", "us", "ms", "s"]
-            onCurrentIndexChanged: oscill.timebaseSelected(sliderbase.value, 3*(currentIndex-3))
-            onActivated: oscill.timebaseSelected(sliderbase.value, 3*(currentIndex-3))
+            onCurrentIndexChanged: oscill.timebaseSelected(sliderbase.value, tens.currentIndex+3*(currentIndex-3))
+            onActivated: oscill.timebaseSelected(sliderbase.value, tens.currentIndex+3*(currentIndex-3))
         }
+
         }
         Slider  {
             id: sliderbase
-            minimumValue: 10
-            maximumValue: 1000
-            stepSize: 10
-            value: 10
+            minimumValue: 1
+            maximumValue: 10
+            stepSize: 1
+            value: 1
             anchors.margins: 20
             style: sliderStyle
             onValueChanged: {
                 valuebase.text = value
-                oscill.timebaseSelected(value, 3*(base.currentIndex-3))
+                oscill.timebaseSelected(value, tens.currentIndex+3*(base.currentIndex-3))
             }
         }
         Row {
+
+        Switch {
+                style: switchStyle
+                checked: true
+                onCheckedChanged: oscill.updateUsed(0, checked)
+
+        }
+
         Label   {
             text: "CH1 Offset: "
-            color: "white"
+            color: "yellow"
         }
         Label   {
             id: valueoffset
@@ -154,7 +175,7 @@ Rectangle {
             id: slideroffset
             minimumValue: -1
             maximumValue: 1
-            stepSize: 0.1
+            stepSize: 0.2
             value: 0
             anchors.margins: 20
             style: sliderStyle
@@ -167,7 +188,7 @@ Rectangle {
         Row {
         Label   {
             text: "CH1 Voltage: "
-            color: "white"
+            color: "yellow"
         }
         ComboBox {
             id : volt
@@ -175,6 +196,53 @@ Rectangle {
             model: ["10 mV","20 mV","50 mV","100 mV","200 mV","500 mV", "1V", "2V", "5V"]
             onCurrentIndexChanged: oscill.voltageGainSelected(0, currentIndex)
             onActivated: oscill.voltageGainSelected(0, currentIndex)
+        }
+
+
+    }
+        Row {
+        Switch {
+                    style: switchStyle
+                    checked: false
+                    onCheckedChanged: oscill.updateUsed(1, checked)
+
+        }
+        Label   {
+            text: "CH2 Offset: "
+            color: "cyan"
+        }
+        Label   {
+            id: valueoffset2
+            text: "1"
+            color: "white"
+        }
+
+        }
+        Slider  {
+            id: slideroffset2
+            minimumValue: -1
+            maximumValue: 1
+            stepSize: 0.2
+            value: 0
+            anchors.margins: 20
+            style: sliderStyle
+            onValueChanged: {
+                valueoffset2.text = value
+                oscill.offsetSelected(1, value)
+            }
+        }
+
+        Row {
+        Label   {
+            text: "CH2 Voltage: "
+            color: "cyan"
+        }
+        ComboBox {
+            id : volt2
+            currentIndex: 8
+            model: ["10 mV","20 mV","50 mV","100 mV","200 mV","500 mV", "1V", "2V", "5V"]
+            onCurrentIndexChanged: oscill.voltageGainSelected(1, currentIndex)
+            onActivated: oscill.voltageGainSelected(1, currentIndex)
         }
 
 

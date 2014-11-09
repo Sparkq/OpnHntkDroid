@@ -5,12 +5,8 @@ import OpenGLUnderQML 1.0
 import "qmls"
 
 ApplicationWindow {
-        //id: field
         visible: true
         color: "transparent"
-
-       // width: 720
-       // height: 1280
         title: qsTr("Hello World")
 
         Item {
@@ -21,6 +17,10 @@ ApplicationWindow {
                 anchors.fill: parent
                 style: touchStyle
                 Tab {
+                    title: "Settings"
+                    Setts{ visible: true }
+                }
+                Tab {
                     title: "Graph"
                     Rectangle {
                         width: parent.width
@@ -29,10 +29,7 @@ ApplicationWindow {
                         visible: true
                     }
                 }
-                Tab {
-                    title: "Settings"
-                    Setts{ visible: true }
-                }
+
 
             }
 
@@ -88,18 +85,13 @@ ApplicationWindow {
 
 
             onSettMessage: mesg.text = message
-           // SequentialAnimation  {
-               // NumberAnimation { to: 1; duration: 100; easing.type: Easing.InQuad }
-               // NumberAnimation { to: 0; duration: 100; easing.type: Easing.OutQuad }
-               // loops: Animation.Infinite
-               // running: true
-          //  }
+
         }
         Label   {
             id:mesg
             anchors.bottom: parent.bottom
             text: oscill.message
-            color: "white"
+            color: "#95ffffff"
 
 
 
