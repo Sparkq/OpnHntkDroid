@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #ifndef CONFIGPAGES_H
 #define CONFIGPAGES_H
 
@@ -178,4 +178,5 @@ class DsoConfigScopePage : public QWidget {
 };
 
 
+#endif
 #endif

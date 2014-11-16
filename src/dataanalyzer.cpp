@@ -32,7 +32,7 @@
 
 #include "dataanalyzer.h"
 
-#include "glscope.h"
+//#include "glscope.h"
 #include "helper.h"
 #include "settings.h"
 

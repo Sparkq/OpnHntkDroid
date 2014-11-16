@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #ifndef LEVELSLIDER_H
 #define LEVELSLIDER_H
 
@@ -115,4 +115,5 @@ class LevelSlider : public QWidget {
 };
 
 
+#endif
 #endif

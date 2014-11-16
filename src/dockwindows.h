@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #ifndef DOCKWINDOWS_H
 #define DOCKWINDOWS_H
 
@@ -237,4 +237,5 @@ class SpectrumDock : public QDockWidget {
 };
 
 
+#endif
 #endif

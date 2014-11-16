@@ -6,27 +6,16 @@ SOURCES += main.cpp \
     src/hantek/control.cpp \
     src/hantek/device.cpp \
     src/hantek/types.cpp \
-    src/colorbox.cpp \
-    src/configdialog.cpp \
-    src/configpages.cpp \
     src/dataanalyzer.cpp \
-    src/dockwindows.cpp \
     src/dso.cpp \
     src/dsocontrol.cpp \
-    src/dsowidget.cpp \
-    src/exporter.cpp \
     src/glgenerator.cpp \
-    src/glscope.cpp \
     src/hardcontrol.cpp \
     src/helper.cpp \
-    src/levelslider.cpp \
-    src/openhantek.cpp \
     src/settings.cpp \
-    src/sispinbox.cpp \
     src/viewer.cpp
 
-RESOURCES += qml.qrc \
-    application.qrc
+RESOURCES += qml.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -38,24 +27,14 @@ HEADERS += \
     src/hantek/control.h \
     src/hantek/device.h \
     src/hantek/types.h \
-    src/colorbox.h \
-    src/configdialog.h \
-    src/configpages.h \
     src/dataanalyzer.h \
-    src/dockwindows.h \
     src/dso.h \
     src/dsocontrol.h \
-    src/dsowidget.h \
-    src/exporter.h \
     src/glgenerator.h \
-    src/glscope.h \
     src/hardcontrol.h \
     src/helper.h \
-    src/levelslider.h \
-    src/openhantek.h \
     src/requests.h \
     src/settings.h \
-    src/sispinbox.h \
     src/viewer.h
 
 DEFINES += DEBUG

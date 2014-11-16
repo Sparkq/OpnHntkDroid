@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #include <cmath>
 
 #include <QGridLayout>
@@ -760,3 +760,4 @@ void DsoWidget::updateMarker(int marker, double value) {
 	
 	emit markerChanged(marker, value);
 }
+#endif

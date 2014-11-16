@@ -23,7 +23,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #include <cmath>
 
 #include <QColor>
@@ -228,3 +228,4 @@ void GlScope::drawGrid() {
     //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaGrid[2].data);
 	glDrawArrays(GL_LINE_LOOP, 0, this->generator->vaGrid[2].getSize() / 2);
 }
+#endif

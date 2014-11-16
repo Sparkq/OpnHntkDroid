@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #include <cfloat>
 #include <cmath>
 
@@ -186,3 +186,4 @@ void SiSpinBox::init() {
 void SiSpinBox::resetSteppedTo() {
 	this->steppedTo = false;
 }
+#endif

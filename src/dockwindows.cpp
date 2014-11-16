@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
@@ -771,3 +771,4 @@ void VoltageDock::hard_event(int type, int value)
 		break;
 	}
 }
+#endif

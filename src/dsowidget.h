@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #ifndef DSOWIDGET_H
 #define DSOWIDGET_H
 
@@ -156,4 +156,5 @@ class DsoWidget : public QWidget {
 };
 
 
+#endif
 #endif

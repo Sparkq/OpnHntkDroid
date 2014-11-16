@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QListWidget>
@@ -146,3 +146,4 @@ void DsoConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *prev
 	
 	pagesWidget->setCurrentIndex(contentsWidget->row(current));
 }
+#endif

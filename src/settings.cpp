@@ -24,12 +24,12 @@
 
 #include <QColor>
 #include <QSettings>
-
-
+#include <QWidget>
+#include <QApplication>
 #include "settings.h"
 
 #include "dso.h"
-#include "dsowidget.h"
+//#include "dsowidget.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////

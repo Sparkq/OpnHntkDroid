@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #ifndef EXPORTER_H
 #define EXPORTER_H
 
@@ -70,4 +70,5 @@ class Exporter : public QObject {
 };
 
 
+#endif
 #endif

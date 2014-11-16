@@ -20,7 +20,7 @@
 //  this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 ////////////////////////////////////////////////////////////////////////////////
-
+#if 0
 
 #include <QCheckBox>
 #include <QDoubleSpinBox>
@@ -339,3 +339,4 @@ void DsoConfigScopePage::saveSettings() {
 	this->settings->view.interpolation = (Dso::InterpolationMode) this->interpolationComboBox->currentIndex();
 	this->settings->view.digitalPhosphorDepth = this->digitalPhosphorDepthSpinBox->value();
 }
+#endif

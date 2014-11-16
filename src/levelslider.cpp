@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #include <cmath>
 
 #include <QMouseEvent>
@@ -581,3 +581,4 @@ int LevelSlider::fixValue(int index) {
 	}
 	return 0;
 }
+#endif

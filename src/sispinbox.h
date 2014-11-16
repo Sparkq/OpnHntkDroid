@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #ifndef SISPINBOX_H
 #define SISPINBOX_H
 
@@ -73,4 +73,5 @@ class SiSpinBox : public QDoubleSpinBox
 		void resetSteppedTo();
 };
 
+#endif
 #endif

@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #ifndef COLORBOX_H
 #define COLORBOX_H
 
@@ -55,4 +55,5 @@ class ColorBox : public QPushButton {
 };
 
 
+#endif
 #endif

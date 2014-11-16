@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #include <QColorDialog>
 #include <QFocusEvent>
 #include <QPushButton>
@@ -71,3 +71,4 @@ void ColorBox::waitForColor() {
 	if(color.isValid())
 		this->setColor(color);
 }
+#endif

@@ -24,7 +24,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #ifndef GLSCOPE_H
 #define GLSCOPE_H
 
@@ -70,4 +70,5 @@ class GlScope : public QGLWidget {
 };
 
 
+#endif
 #endif

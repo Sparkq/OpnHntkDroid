@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#if 0
 #include <cmath>
 
 #include <QFile>
@@ -408,3 +408,4 @@ bool Exporter::doExport() {
 		return true;
 	}
 }
+#endif
