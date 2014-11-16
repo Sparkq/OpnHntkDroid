@@ -8,9 +8,7 @@
 #include "glgenerator.h"
 #include "settings.h"
 #include "hardcontrol.h"
-//#include "configdialog.h"
 #include "dataanalyzer.h"
-//#include "dockwindows.h"
 #include "dsocontrol.h"
 #include "viewer.h"
 #include "settings.h"
@@ -48,16 +46,11 @@ Viewer::Viewer()
 
     this->hardControl->updateLEDs();
 
-
-    //m_renderer = new ViewerRenderer(this->settings);
-    //m_renderer->setGenerator(this->generator);
     connect(this, SIGNAL(windowChanged(QQuickWindow*)), this, SLOT(handleWindowChanged(QQuickWindow*)));
 }
 
 void Viewer::connectSignals() {
     // Connect general signals
-    //connect(this, SIGNAL(settingsChanged()), this, SLOT(applySettings()));
-    //connect(this->dsoWidget, SIGNAL(stopped()), this, SLOT(stopped()));
     connect(this->dsoControl, SIGNAL(statusMessage(QString, int)), this, SLOT(showMessage(QString, int)));
     connect(this->dsoControl, SIGNAL(samplesAvailable(const QList<double *> *, const QList<unsigned int> *, double, QMutex *)), this->dataAnalyzer, SLOT(analyze(const QList<double *> *, const QList<unsigned int> *, double, QMutex *)));
 
@@ -110,10 +103,7 @@ void Viewer::connectSignals() {
 
     // Hard Events
     connect(this->hardControl, SIGNAL(new_event(int, int)), this, SLOT(hard_event(int, int)));
-    //connect(this->hardControl, SIGNAL(new_event(int, int)), this->dsoWidget, SLOT(hard_event(int, int)));
-    //connect(this->hardControl, SIGNAL(new_event(int, int)), this->horizontalDock, SLOT(hard_event(int, int)));
-    //connect(this->hardControl, SIGNAL(new_event(int, int)), this->triggerDock, SLOT(hard_event(int, int)));
-    //connect(this->hardControl, SIGNAL(new_event(int, int)), this->voltageDock, SLOT(hard_event(int, int)));
+
 }
 
 void Viewer::initializeDevice() {
@@ -140,10 +130,7 @@ void Viewer::initializeDevice() {
     this->dsoControl->setTriggerSlope(this->settings->scope.trigger.slope);
     this->dsoControl->setTriggerSource(this->settings->scope.trigger.special, this->settings->scope.trigger.source);
 
-    // Apply the limits to the dock widgets
-    //this->horizontalDock->availableRecordLengthsChanged(*this->dsoControl->getAvailableRecordLengths());
-    //this->horizontalDock->samplerateLimitsChanged(this->dsoControl->getMinSamplerate(), this->dsoControl->getMaxSamplerate());
-}
+    }
 
 void Viewer::updateUsed(unsigned int channel, bool checked) {
 
@@ -286,10 +273,13 @@ void Viewer::hard_event(int type, int value) {
 
 void Viewer::update()
 {
-    this->m_renderer->vaEmulated[0].setSize(this->generator->vaEmu.size());
+    for (int j = 0; j< 2; j++)
+    {
+    this->m_renderer->vaEmulated[j].setSize(this->generator->vaEmu[j].size());
 
-    for (int i = 0; i< this->generator->vaEmu.size(); i++)
-        this->m_renderer->vaEmulated[0].data[i] = this->generator->vaEmu.at(i);
+    for (int i = 0; i< this->generator->vaEmu[j].size(); i++)
+        this->m_renderer->vaEmulated[j].data[i] = this->generator->vaEmu[j].at(i);
+    }
     for (int j = 0; j< 2; j++)
     {
     this->m_renderer->vaChannel[0][j][0].setSize(this->generator->vaCha[j].size());
@@ -331,7 +321,6 @@ ViewerRenderer::ViewerRenderer (DsoSettings *settings,bool emulate) {
     this->generator = 0;
 
     m_program = 0;
-    //this->zoomed = false;
 }
 
 ViewerRenderer::~ViewerRenderer()
@@ -403,25 +392,13 @@ void ViewerRenderer::paint()
 
     // Draw the graphs
     if(this->generator && this->generator->digitalPhosphorDepth > 0) {
+
         //if(this->settings->view.antialiasing) {
 //			glEnable(GL_POINT_SMOOTH);
 //			glEnable(GL_LINE_SMOOTH);
 //			glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         //}
 
-        // Apply zoom settings via matrix transformation
-        //if(this->zoomed) {
-            //glPushMatrix();
-            //glScalef(DIVS_TIME / fabs(this->settings->scope.horizontal.marker[1] - this->settings->scope.horizontal.marker[0]), 1.0, 1.0);
-            //glTranslatef(-(this->settings->scope.horizontal.marker[0] + this->settings->scope.horizontal.marker[1]) / 2, 0.0, 0.0);
-        //}
-
-        // Values we need for the fading of the digital phosphor
-//		double *fadingFactor = new double[this->generator->digitalPhosphorDepth];
-//		fadingFactor[0] = 100;
-//		double fadingRatio = pow(10.0, 2.0 / this->generator->digitalPhosphorDepth);
-//		for(int index = 1; index < this->generator->digitalPhosphorDepth; ++index)
-//			fadingFactor[index] = fadingFactor[index - 1] * fadingRatio;
 
         if(!this->emulate) {
     switch(this->settings->scope.horizontal.format) {
@@ -436,12 +413,7 @@ void ViewerRenderer::paint()
                              for(int index = this->generator->digitalPhosphorDepth - 1; index >= 0; index--) {
 
                            if(this->vaChannel[mode][channel][index].data) {
-                                //if(mode == Dso::CHANNELMODE_VOLTAGE)
-                                //    m_program->setUniformValue(1, QColor(255,255,0,255));
-                                    //this->qglColor(this->settings->view.color.screen.voltage[channel].darker(fadingFactor[index]));
-                                //else
-                                //    m_program->setUniformValue(1, QColor(0,255,255,255));
-                                //this->qglColor(this->settings->view.color.screen.spectrum[channel].darker(fadingFactor[index]));
+
                                 if (channel == 0)
                                     m_program->setUniformValue(1, QColor(255,255,0,255));
                                 else
@@ -452,7 +424,7 @@ void ViewerRenderer::paint()
                                 //for(int i=0; i< 40; i++)
                                 //     qDebug("%f",this->vaChannel[mode][channel][index].data[i]);
                                 m_program->setAttributeArray(0, GL_FLOAT, this->vaChannel[mode][channel][index].data, 2);
-                                //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaChannel[mode][channel][index]->data);
+
                                 glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->vaChannel[mode][channel][index].getSize() / 2);
                             }
 
@@ -490,17 +462,15 @@ void ViewerRenderer::paint()
         }
         else
         {
+            for(int channel = 0; channel < 2; ++channel) {
+            if (channel == 0)
+                m_program->setUniformValue(1, QColor(255,255,0,255));
+            else
+                m_program->setUniformValue(1, QColor(0,255,255,255));
+            m_program->setAttributeArray(0, GL_FLOAT, this->vaEmulated[channel].data, 2);
 
-
-                m_program->setUniformValue(1, QColor(255,255,255,255));
-
-           // for(int i=0; i< 40; i++)
-            //    qDebug("%f",this->vaEmulated[0].data[i]);
-
-            m_program->setAttributeArray(0, GL_FLOAT, this->vaEmulated[0].data, 2);
-
-            glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->vaEmulated[0].getSize() / 2);
-
+            glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->vaEmulated[channel].getSize() / 2);
+        }
 
         }
 
@@ -509,21 +479,21 @@ void ViewerRenderer::paint()
 
         // Grid
         m_program->setUniformValue(1, QColor(255,255,255,255));
-        //this->qglColor(this->settings->view.color.screen.grid);
+
         m_program->setAttributeArray(0, GL_FLOAT, this->generator->vaGrid[0].data, 2);
-        //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaGrid[0].data);
+
         glDrawArrays(GL_POINTS, 0, this->generator->vaGrid[0].getSize() / 2);
         // Axes
         m_program->setUniformValue(1, QColor(255,255,255,255));
-        //this->qglColor(this->settings->view.color.screen.axes);
+
         m_program->setAttributeArray(0, GL_FLOAT, this->generator->vaGrid[1].data, 2);
-        //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaGrid[1].data);
+
         glDrawArrays(GL_LINES, 0, this->generator->vaGrid[1].getSize() / 2);
         // Border
         m_program->setUniformValue(1, QColor(255,255,255,255));
-        //this->qglColor(this->settings->view.color.screen.border);
+
         m_program->setAttributeArray(0, GL_FLOAT, this->generator->vaGrid[2].data, 2);
-        //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaGrid[2].data);
+
         glDrawArrays(GL_LINE_LOOP, 0, this->generator->vaGrid[2].getSize() / 2);
 
 

@@ -81,7 +81,7 @@ class GlGenerator : public QObject {
         QList<QList<GlArray *> > vaChannel[Dso::CHANNELMODE_COUNT];
         GlArray vaGrid[3];
         GlArray vaEmulated[2];
-        QList<float> vaEmu;
+        QList<float> vaEmu[2];
         QList<float> vaCha[2];
         bool emulate;
         void generateGrid();

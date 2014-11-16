@@ -154,6 +154,7 @@ Rectangle {
         Row {
 
         Switch {
+                id: switch1
                 style: switchStyle
                 checked: true
                 onCheckedChanged: oscill.updateUsed(0, checked)
@@ -164,11 +165,11 @@ Rectangle {
             text: "CH1 Offset: "
             color: "yellow"
         }
-        Label   {
-            id: valueoffset
-            text: "1"
-            color: "white"
-        }
+//        Label   {
+//            id: valueoffset
+//            text: "1"
+//            color: "white"
+//        }
 
         }
         Slider  {
@@ -180,7 +181,7 @@ Rectangle {
             anchors.margins: 20
             style: sliderStyle
             onValueChanged: {
-                valueoffset.text = value
+//                valueoffset.text = value
                 oscill.offsetSelected(0, value)
             }
         }
@@ -202,6 +203,7 @@ Rectangle {
     }
         Row {
         Switch {
+                    id: switch2
                     style: switchStyle
                     checked: false
                     onCheckedChanged: oscill.updateUsed(1, checked)
@@ -211,11 +213,11 @@ Rectangle {
             text: "CH2 Offset: "
             color: "cyan"
         }
-        Label   {
-            id: valueoffset2
-            text: "1"
-            color: "white"
-        }
+//        Label   {
+//            id: valueoffset2
+//            text: "1"
+//            color: "white"
+//        }
 
         }
         Slider  {
@@ -227,7 +229,7 @@ Rectangle {
             anchors.margins: 20
             style: sliderStyle
             onValueChanged: {
-                valueoffset2.text = value
+//                valueoffset2.text = value
                 oscill.offsetSelected(1, value)
             }
         }
@@ -254,7 +256,14 @@ Rectangle {
         Switch {
             style: switchStyle
             checked: false
-            onCheckedChanged: oscill.emulateSelected(checked)
+            onCheckedChanged: {
+
+                oscill.emulateSelected(checked)
+                switch1.checked = checked
+                switch2.checked = checked
+
+            }
+
 
         }
 
