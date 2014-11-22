@@ -31,7 +31,6 @@ public:
 
     bool emulate;
     void setViewportSize(const QSize &size) { m_viewportSize = size; }
-    //GlArray vaGrid[3];
     GlArray vaEmulated[2];
     GlArray vaChannel[1][2][1];
 
@@ -53,13 +52,15 @@ class Viewer : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(QString message READ message)
+    Q_PROPERTY(QString amplitude1 READ amplitude1)
+    Q_PROPERTY(QString amplitude2 READ amplitude2)
 
 public:
     Viewer();
     bool emulate = false;
     QString message() {return m_message;}
-
-
+    QString amplitude1() {return m_amplitude1;}
+    QString amplitude2() {return m_amplitude2;}
 
     GlGenerator *generator; ///< The generator for the OpenGL vertex arrays
 
@@ -70,6 +71,8 @@ public:
     HardControl *hardControl;
     DsoControl *dsoControl;
     QString m_message;
+    QString m_amplitude1;
+    QString m_amplitude2;
     void connectSignals();
     void initializeDevice();
 
@@ -78,31 +81,14 @@ public slots:
     void sync();
     void cleanup();
     void update();
-    // File operations
-   // int open();
-   // int save();
-   // int saveAs();
-    // View
-   // void digitalPhosphor(bool enabled);
-   // void zoom(bool enabled);
-    // Oscilloscope control
-   // void started();
-   // void stopped();
     // Hard Events
     void hard_event(int type, int value);
-    // Other
-   // void config();
-   // void about();
 
     // Settings management
-   // void applySettings();
-   // void updateSettings();
     void handleWindowChanged(QQuickWindow *win);
-   // void recordTimeChanged(double duration);
     void samplerateSelected(float samplerate = 0 );
     void timebaseSelected(int value = 10, int power = -3);
     void offsetSelected(unsigned int channel,float value );
-   // void recordLengthSelected(unsigned long recordLength);
     void voltageGainSelected(unsigned int channel, int index);
     void updateUsed(unsigned int channel, bool checked);
     void emulateSelected(bool emulate);
@@ -111,6 +97,7 @@ public slots:
 
 signals:
    void settMessage();
+   void settAmpl();
 
 
 
@@ -118,7 +105,6 @@ private:
     ViewerRenderer *m_renderer;
 
 };
-//QML_DECLARE_TYPEINFO(Viewer, QML_HAS_ATTACHED_PROPERTIES)
 
 
 #endif

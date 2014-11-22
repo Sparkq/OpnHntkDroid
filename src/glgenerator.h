@@ -92,11 +92,6 @@ class GlGenerator : public QObject {
 	private:
 		DataAnalyzer *dataAnalyzer;
 		DsoSettings *settings;
-
-        //QList<QList<GlArray *> > vaChannel[Dso::CHANNELMODE_COUNT];
-        //GlArray vaGrid[3];
-		
-        //int digitalPhosphorDepth;
 	
 	public slots:
 		void generateGraphs();

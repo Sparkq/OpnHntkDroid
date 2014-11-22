@@ -8,6 +8,7 @@ ApplicationWindow {
         visible: true
         color: "transparent"
         title: qsTr("Hello World")
+        onClosing: Qt.quit();
 
         Item {
             width: parent.width
@@ -67,25 +68,15 @@ ApplicationWindow {
             }
 
 
-//        menuBar: MenuBar {
-//            Menu {
-//                title: qsTr("File")
-//                MenuItem {
-//                    text: qsTr("&Open")
-//                    onTriggered: console.log("Open action triggered");
-//                }
-//                MenuItem {
-//                    text: qsTr("Exit")
-//                    onTriggered: Qt.quit();
-//                }
-//            }
-//        }
         Viewer {
             id: oscill
 
 
             onSettMessage: mesg.text = message
-
+            onSettAmpl: {
+                ch1ampl.text = amplitude1
+                ch2ampl.text = amplitude2
+            }
         }
         Label   {
             id:mesg
@@ -95,6 +86,34 @@ ApplicationWindow {
 
 
 
+        }
+        Row     {
+            id:ch1a
+            anchors.bottom: mesg.top
+            anchors.left: parent.left
+            Label{
+                text: "CH1:"
+                color: "yellow"
+            }
+            Label{
+                id: ch1ampl
+                text: ""
+                color: "yellow"
+            }
+        }
+        Row     {
+            id: ch2a
+            anchors.bottom: mesg.top
+            anchors.right: parent.right
+            Label{
+                text: "CH2:"
+                color: "cyan"
+            }
+            Label{
+                id: ch2ampl
+                text: ""
+                color: "cyan"
+            }
         }
 }
 

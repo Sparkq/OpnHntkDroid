@@ -30,8 +30,6 @@ Viewer::Viewer()
     // The data analyzer
     this->dataAnalyzer = new DataAnalyzer(this->settings);
 
-    // Apply the settings after the gui is initialized
-   // this->applySettings();
 
     // Create hard control instance
     this->hardControl = new HardControl(this->settings);
@@ -54,52 +52,9 @@ void Viewer::connectSignals() {
     connect(this->dsoControl, SIGNAL(statusMessage(QString, int)), this, SLOT(showMessage(QString, int)));
     connect(this->dsoControl, SIGNAL(samplesAvailable(const QList<double *> *, const QList<unsigned int> *, double, QMutex *)), this->dataAnalyzer, SLOT(analyze(const QList<double *> *, const QList<unsigned int> *, double, QMutex *)));
 
-    // Connect signals to DSO controller and widget
-//    connect(this->horizontalDock, SIGNAL(samplerateChanged(double)), this, SLOT(samplerateSelected()));
-//    connect(this->horizontalDock, SIGNAL(timebaseChanged(double)), this, SLOT(timebaseSelected()));
-//    connect(this->horizontalDock, SIGNAL(frequencybaseChanged(double)), this->dsoWidget, SLOT(updateFrequencybase(double)));
-//    connect(this->horizontalDock, SIGNAL(recordLengthChanged(unsigned long)), this, SLOT(recordLengthSelected(unsigned long)));
-    //connect(this->horizontalDock, SIGNAL(formatChanged(HorizontalFormat)), this->dsoWidget, SLOT(horizontalFormatChanged(HorizontalFormat)));
-
-//    connect(this->triggerDock, SIGNAL(modeChanged(Dso::TriggerMode)), this->dsoControl, SLOT(setTriggerMode(Dso::TriggerMode)));
-//    connect(this->triggerDock, SIGNAL(modeChanged(Dso::TriggerMode)), this->dsoWidget, SLOT(updateTriggerMode()));
-//    connect(this->triggerDock, SIGNAL(modeChanged(Dso::TriggerMode)), this->hardControl, SLOT(updateLEDs()));
-//    connect(this->triggerDock, SIGNAL(sourceChanged(bool, unsigned int)), this->dsoControl, SLOT(setTriggerSource(bool, unsigned int)));
-//    connect(this->triggerDock, SIGNAL(sourceChanged(bool, unsigned int)), this->dsoWidget, SLOT(updateTriggerSource()));
-//    connect(this->triggerDock, SIGNAL(sourceChanged(bool, unsigned int)), this->hardControl, SLOT(updateLEDs()));
-//    connect(this->triggerDock, SIGNAL(slopeChanged(Dso::Slope)), this->dsoControl, SLOT(setTriggerSlope(Dso::Slope)));
-//    connect(this->triggerDock, SIGNAL(slopeChanged(Dso::Slope)), this->dsoWidget, SLOT(updateTriggerSlope()));
-//    connect(this->triggerDock, SIGNAL(slopeChanged(Dso::Slope)), this->hardControl, SLOT(updateLEDs()));
-//    connect(this->dsoWidget, SIGNAL(triggerPositionChanged(double)), this->dsoControl, SLOT(setPretriggerPosition(double)));
-//    connect(this->dsoWidget, SIGNAL(triggerLevelChanged(unsigned int, double)), this->dsoControl, SLOT(setTriggerLevel(unsigned int, double)));
-
-//    connect(this->voltageDock, SIGNAL(usedChanged(unsigned int, bool)), this, SLOT(updateUsed(unsigned int)));
-//    connect(this->voltageDock, SIGNAL(usedChanged(unsigned int, bool)), this->dsoWidget, SLOT(updateVoltageUsed(unsigned int, bool)));
-//    connect(this->voltageDock, SIGNAL(usedChanged(unsigned int, bool)), this->hardControl, SLOT(updateLEDs()));
-//    connect(this->voltageDock, SIGNAL(couplingChanged(unsigned int, Dso::Coupling)), this->dsoControl, SLOT(setCoupling(unsigned int, Dso::Coupling)));
-//    connect(this->voltageDock, SIGNAL(couplingChanged(unsigned int, Dso::Coupling)), this->dsoWidget, SLOT(updateVoltageCoupling(unsigned int)));
-//    connect(this->voltageDock, SIGNAL(couplingChanged(unsigned int, Dso::Coupling)), this->hardControl, SLOT(updateLEDs()));
-//    connect(this->voltageDock, SIGNAL(modeChanged(Dso::MathMode)), this->dsoWidget, SLOT(updateMathMode()));
-//    connect(this->voltageDock, SIGNAL(gainChanged(unsigned int, double)), this, SLOT(updateVoltageGain(unsigned int)));
-//    connect(this->voltageDock, SIGNAL(gainChanged(unsigned int, double)), this->dsoWidget, SLOT(updateVoltageGain(unsigned int)));
-//    connect(this->dsoWidget, SIGNAL(offsetChanged(unsigned int, double)), this, SLOT(updateOffset(unsigned int)));
-
-//    connect(this->spectrumDock, SIGNAL(usedChanged(unsigned int, bool)), this, SLOT(updateUsed(unsigned int)));
-//    connect(this->spectrumDock, SIGNAL(usedChanged(unsigned int, bool)), this->dsoWidget, SLOT(updateSpectrumUsed(unsigned int, bool)));
-//    connect(this->spectrumDock, SIGNAL(magnitudeChanged(unsigned int, double)), this->dsoWidget, SLOT(updateSpectrumMagnitude(unsigned int)));
-
     // Started/stopped signals from oscilloscope
-   // connect(this->dsoControl, SIGNAL(samplingStarted()), this, SLOT(started()));
     connect(this->dsoControl, SIGNAL(samplingStarted()), this->hardControl, SLOT(started()));
-   // connect(this->dsoControl, SIGNAL(samplingStopped()), this, SLOT(stopped()));
     connect(this->dsoControl, SIGNAL(samplingStopped()), this->hardControl, SLOT(stopped()));
-
-    //connect(this->dsoControl, SIGNAL(recordLengthChanged(unsigned long)), this, SLOT(recordLengthChanged()));
-    //connect(this->dsoControl, SIGNAL(recordTimeChanged(double)), this, SLOT(recordTimeChanged(double)));
-    //connect(this->dsoControl, SIGNAL(samplerateChanged(double)), this, SLOT(samplerateChanged(double)));
-
-    //connect(this->dsoControl, SIGNAL(availableRecordLengthsChanged(QList<unsigned int>)), this->horizontalDock, SLOT(availableRecordLengthsChanged(QList<unsigned int>)));
-   // connect(this->dsoControl, SIGNAL(samplerateLimitsChanged(double, double)), this->horizontalDock, SLOT(samplerateLimitsChanged(double, double)));
 
     // Hard Events
     connect(this->hardControl, SIGNAL(new_event(int, int)), this, SLOT(hard_event(int, int)));
@@ -107,15 +62,7 @@ void Viewer::connectSignals() {
 }
 
 void Viewer::initializeDevice() {
-#if 0
-    qDebug("%s:%i\n", __func__, __LINE__);qDebug("%s:%i\n", __func__, __LINE__);
-    for(unsigned int channel = 0; channel < this->settings->scope.physicalChannels; ++channel) {
-        this->dsoControl->setCoupling(channel, (Dso::Coupling) this->settings->scope.voltage[channel].misc);
-        this->updateVoltageGain(channel);
-        this->updateOffset(channel);
-        this->dsoControl->setTriggerLevel(channel, this->settings->scope.voltage[channel].trigger);
-    }
-#endif
+
     this->updateUsed(this->settings->scope.physicalChannels, true);
     if(this->settings->scope.horizontal.samplerateSet)
         this->samplerateSelected();
@@ -170,20 +117,11 @@ void Viewer::offsetSelected(unsigned int channel,float value ) {
     if(channel < this->settings->scope.voltage.count()) {
         this->settings->scope.voltage[channel].offset = value * (DIVS_VOLTAGE/2);
 
-
-//		if(channel < (int) this->settings->scope.physicalChannels)
-//			this->adaptTriggerLevelSlider(channel);
     }
-//	else if(channel < this->settings->scope.voltage.count() * 2)
-//		this->settings->scope.spectrum[channel - this->settings->scope.voltage.count()].offset = value;
 
-//	emit offsetChanged(channel, value);
     this->dsoControl->setOffset(channel, (this->settings->scope.voltage[channel].offset / DIVS_VOLTAGE) + 0.5);
 }
 
-//void Viewer::horizontalFormatSelected(unsigned long recordLength) {
-//    this->dsoControl->setRecordLength(recordLength);
-//}
 
 void Viewer::voltageGainSelected(unsigned int channel, int index) {
     if(channel >= this->settings->scope.physicalChannels)
@@ -209,67 +147,16 @@ void Viewer::showMessage(QString str, int) {
     emit settMessage();
 }
 
+
 void Viewer::hard_event(int type, int value) {
-    int i;
-
-    switch (type) {
-    case PANEL_SW_R_RUN_STOP:
-       // startStopAction->activate(QAction::Trigger);
-        break;
-    case PANEL_SW_H_TIMEBASE:
-       // zoomAction->activate(QAction::Trigger);
-        break;
-    case PANEL_SW_R_DEFAULT:
-       // horizontalDock->setSamplerate(1e6);
-       // horizontalDock->setTimebase(1e-3);
-       // horizontalDock->setFrequencybase(1e3);
-#if 0
-        horizontalDock->setRecordLength();
-#endif
-       // horizontalDock->setFormat(Dso::GRAPHFORMAT_TY);
-       // triggerDock->setMode(Dso::TRIGGERMODE_AUTO);
-       // triggerDock->setSource(false, 0);
-       // triggerDock->setSlope(Dso::SLOPE_POSITIVE);
-
-       // for (i = 0; i < HANTEK_CHANNELS; i++) {
-       //     voltageDock->setCoupling(i, Dso::COUPLING_DC);
-       //     voltageDock->setGain(i, 1);
-       //     voltageDock->setUsed(i, 1);
-       // }
-       // voltageDock->setUsed(HANTEK_CHANNELS, 0);
-       // voltageDock->setGain(HANTEK_CHANNELS, 1);
-       // voltageDock->setMode(Dso::MATHMODE_1ADD2);
-
-        break;
+    switch (type)
+    {
     case PANEL_SW_T_MANUAL:
         this->dsoControl->forceTrigger();
         break;
     }
 }
 
-
-
-
-
-///// \brief The oscilloscope started sampling.
-//void Viewer::started() {
-//    this->startStopAction->setText(tr("&Stop"));
-//    this->startStopAction->setIcon(QIcon(":actions/stop.png"));
-//    this->startStopAction->setStatusTip(tr("Stop the oscilloscope"));
-
-//    disconnect(this->startStopAction, SIGNAL(triggered()), this->dsoControl, SLOT(startSampling()));
-//    connect(this->startStopAction, SIGNAL(triggered()), this->dsoControl, SLOT(stopSampling()));
-//}
-
-/////// \brief The oscilloscope stopped sampling.
-//void Viewer::stopped() {
-//    this->startStopAction->setText(tr("&Start"));
-//    this->startStopAction->setIcon(QIcon(":actions/start.png"));
-//    this->startStopAction->setStatusTip(tr("Start the oscilloscope"));
-
-//    disconnect(this->startStopAction, SIGNAL(triggered()), this->dsoControl, SLOT(stopSampling()));
-//    connect(this->startStopAction, SIGNAL(triggered()), this->dsoControl, SLOT(startSampling()));
-//}
 
 void Viewer::update()
 {
@@ -287,7 +174,12 @@ void Viewer::update()
     for (int i = 0; i< this->generator->vaCha[j].size(); i++)
         this->m_renderer->vaChannel[0][j][0].data[i] = this->generator->vaCha[j].at(i);
     }
-
+    if (!emulate)
+    {
+    m_amplitude1 = Helper::valueToString(this->dataAnalyzer->data(0)->amplitude, Helper::UNIT_VOLTS,4);
+    m_amplitude2 = Helper::valueToString(this->dataAnalyzer->data(1)->amplitude, Helper::UNIT_VOLTS,4);
+    emit settAmpl();
+    }
     if (window())
         window()->update();
 }
@@ -437,24 +329,6 @@ void ViewerRenderer::paint()
                 }
 
             break;
-
-//        case Dso::GRAPHFORMAT_XY:
-//            // Real and virtual channels
-//            for(int channel = 0; channel < this->settings->scope.voltage.count() - 1; channel += 2) {
-//                if(this->settings->scope.voltage[channel].used) {
-//                    // Draw graph for all available depths
-//                    for(int index =  this->generator->digitalPhosphorDepth - 1; index >= 0; index--) {
-//                       // if(this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->data) {
-//                            m_program->setUniformValue(1, QColor(0,255,0,255));
-//                            //this->qglColor(this->settings->view.color.screen.voltage[channel].darker(fadingFactor[index]));
-//                            m_program->setAttributeArray(0, GL_FLOAT, this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index].data, 2);
-//                            //glVertexPointer(2, GL_FLOAT, 0, this->generator->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index]->data);
-//                            glDrawArrays((this->settings->view.interpolation == Dso::INTERPOLATION_OFF) ? GL_POINTS : GL_LINE_STRIP, 0, this->vaChannel[Dso::CHANNELMODE_VOLTAGE][channel][index].getSize() / 2);
-//                      //  }
-//                    }
-//                }
-//            }
-//            break;
 
         default:
             break;
