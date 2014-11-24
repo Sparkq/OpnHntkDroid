@@ -63,8 +63,6 @@ public:
     QString amplitude2() {return m_amplitude2;}
 
     GlGenerator *generator; ///< The generator for the OpenGL vertex arrays
-
-    ViewerRenderer *mainScope; ///< The main scope screen
     DsoSettings *settings; ///< The settings provided by the main window
 
     DataAnalyzer *dataAnalyzer; ///< The data source provided by the main window
